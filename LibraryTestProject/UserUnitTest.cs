@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using BusinessLogicClassLibrary;
+using DataAcessClassLibrary;
+
 namespace LibraryTestProject
 {
     [TestClass]
@@ -7,40 +8,46 @@ namespace LibraryTestProject
     {
       
         [TestMethod]
-        public void TestUserExist()
+        public void TestUserName()
         {
-            bool actual = false;
-            bool expected = false;
-            BLLUser user = new BLLUser();
-            actual = user.userExist(1);
+            string actual;
+            string expected;
+            DAUser user = new DAUser();
+            actual = user.GetUser(1).UserName;
+            expected = "Antoine";
             Assert.AreEqual(expected, actual);  
         }
         [TestMethod]
-        public void TestLogin()
+        public void TestPassword()
         {
-            bool actual = false;
-            bool expected = false;
-            BLLUser login = new BLLUser();
-            actual = login.Login("Antoine", "Password");
-            Assert.AreEqual(expected , actual); 
-        }
-        [TestMethod]
-        public void TestUserGetRole()
-        {
-            bool actual = false;
-            Roles expected = Roles.guest;
-            BLLUser login = new BLLUser();
-            Roles roles = login.getUserRole("Antoine", "Password");
+            string actual;
+            string expected;
+            DAUser user = new DAUser();
+            actual = user.GetUser(3).password;
+            expected = "Hero";
             Assert.AreEqual(expected, actual);
         }
         [TestMethod]
-        public void TestGetUser()
+        public void TestRole()
         {
-            BLLUser actual;
-            BLLUser expected = new BLLUser(0,"Ant",Roles.guest,"pass");
-            BLLUser login = new BLLUser();
-            actual = login.getUser(1);
+            int actual;
+            int expected;
+            DAUser user = new DAUser();
+            actual = user.GetUser(3).Role;
+            expected = 3;
             Assert.AreEqual(expected, actual);
         }
+        public void TestCount()
+        {
+            int actual;
+            int expected;
+            DAUser user = new DAUser();
+            actual = user.GetAllUser().Count;
+            expected = 3;
+            Assert.AreEqual(expected, actual);
+        }
+
+      
+
     }
 }

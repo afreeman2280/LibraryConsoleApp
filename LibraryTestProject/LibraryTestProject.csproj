@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BusinessLogicClassLibrary\BusinessLogicClassLibrary.csproj" />
+    <ProjectReference Include="..\DataAcessClassLibrary\DataAccessClassLibrary.csproj" />
   </ItemGroup>
 
 </Project>

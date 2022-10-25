@@ -7,22 +7,22 @@ namespace LibraryConsoleApp
     internal class Program
     {
         public static BLLUser newUser = new BLLUser();
+        public static BLLBook newBook = new BLLBook();
+        public static BLLRole newRole = new BLLRole();
 
         static void Main(string[] args)
         {
-            int userID = 1;
-            int id;
             bool showMenu = true;
             bool success = true;
-            int loginUserID;
             string loginUserName = "Guest";
-            Roles loginRole = Roles.guest;
-            
+            string loginRole = "Guest";
+            int loginRoleId = 1;
+
             while (showMenu)
             {
                 Console.WriteLine("Hello " + loginUserName + "!");
-                Console.WriteLine("Your Role is " + loginRole);
-
+                Console.WriteLine("Your Role is " + loginRole +"\n"  );
+                
                 Console.WriteLine("Choose an opton:");
                 Console.WriteLine("1) Register");
                 Console.WriteLine("2) Login");
@@ -31,29 +31,38 @@ namespace LibraryConsoleApp
                 Console.WriteLine("5) Update User");
                 Console.WriteLine("6) Remove User");
                 Console.WriteLine("7) Logout");
-                Console.WriteLine("8) Exit");
+                Console.WriteLine("8) Add Book");
+                Console.WriteLine("9) Print Books");
+                Console.WriteLine("10) Update Book ");
+                Console.WriteLine("11) Remove Book");
+                Console.WriteLine("12) Exit");
 
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        registerUser(userID,newUser);
-                        userID++;
+                        registerUser(newUser);
                         break;
                     case "2":
                         Console.WriteLine("Enter UserName");
                         string userName = Console.ReadLine();
                         Console.WriteLine("Enter Password");
                         string password = Console.ReadLine();
-                        success = login(newUser,userName,password);
-                        if(success)
+                        success = login(newUser, userName, password);
+                        if (success)
                         {
                             loginUserName = userName;
-                            loginRole = newUser.getUserRole(userName,password);
+                            loginRoleId = newUser.getUserInfoForLogin(userName, password);
+                            loginRole = newRole.getRole(loginRoleId);
+                            Console.WriteLine("Login Sucessful");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Username or Password is incorrect");
                         }
                         break;
 
                     case "3":
-                        if (loginRole == Roles.Administrator || loginRole == Roles.Librarian)
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
                         {
                             printAllUsers(newUser);
                         }
@@ -64,14 +73,14 @@ namespace LibraryConsoleApp
                         break;
 
                     case "4":
-                        if (loginRole == Roles.Administrator || loginRole == Roles.Librarian || loginRole == Roles.Patron)
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian" || loginRole.ToLower() == "patron")
                         {
-
+                            int userID;
                             Console.WriteLine("Enter Id");
-                            success = int.TryParse(Console.ReadLine(), out id);
+                            success = int.TryParse(Console.ReadLine(), out userID);
                             if (success)
                             {
-                                printSingleUser(id, newUser);
+                                printSingleUser(userID, newUser);
                             }
                             else
                             {
@@ -84,7 +93,7 @@ namespace LibraryConsoleApp
                         }
                         break;
                     case "5":
-                        if (loginRole == Roles.Administrator || loginRole == Roles.Librarian)
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
                         {
                             updateUser(newUser);
                         }
@@ -95,13 +104,18 @@ namespace LibraryConsoleApp
                         }
                         break;
                     case "6":
-                        if (loginRole == Roles.Administrator || loginRole == Roles.Librarian)
+                        int id;
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
                         {
                             Console.WriteLine("Enter Id");
                             success = int.TryParse(Console.ReadLine(), out id);
                             if (success)
                             {
                                 removeUser(id, newUser);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Entry");
                             }
                         }
                         else
@@ -112,9 +126,67 @@ namespace LibraryConsoleApp
                         break;
                     case "7":
                         loginUserName = "Guest";
-                        loginRole = Roles.guest;
+                        loginRoleId = 1;
+                        loginRole = newRole.getRole(loginRoleId);
+
                         break;
                     case "8":
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
+                        {
+                            AddBook(newBook);
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Only Administrator and Librarians can use this feature");
+
+                        }
+                        break;
+                    case "9":
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
+                        {
+                        printAllBooks(newBook);
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Only Administrator and Librarians can use this feature");
+
+                        }
+                        break;
+                    case "10":
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
+                        {
+                            updateBook(newBook);
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Only Administrator and Librarians can use this feature");
+
+                        }
+                        break;
+                    case "11":
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian")
+                        {
+                            Console.WriteLine("Enter Id");
+                            success = int.TryParse(Console.ReadLine(), out id);
+                            if (success)
+                            {
+                                removeBook(id, newBook);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Not Valid Entry");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Only Administrator and Librarians can use this feature");
+
+                        }
+                        break;
+                    case "12":
                         showMenu = false;
                         break;
                     default:
@@ -124,22 +196,33 @@ namespace LibraryConsoleApp
                 }
             }
         }
-       public static void registerUser(int userID,BLLUser newUser)
+        public static void registerUser( BLLUser newUser)
         {
             Console.WriteLine("Enter UserName");
             string userName = Console.ReadLine();
             Console.WriteLine("Enter user's password");
             string password = Console.ReadLine();
             Console.WriteLine("What is the user's role?");
-            string userRole = Console.ReadLine();
-            newUser.addUser(userID,userName,userRole,password);
-            newUser.printAllUsers();
+            int userRole = int.Parse(Console.ReadLine());
+            newUser.addUser( userName, userRole, password);
         }
-        public static bool login(BLLUser user,string userName,string password)
+        public static void AddBook(BLLBook newBook)
         {
-            
-            return user.Login(userName,password);
+            Console.WriteLine("Enter Book Name");
+            string bookName = Console.ReadLine();
+            Console.WriteLine("Enter The Author Name");
+            string authorName = Console.ReadLine();
+            newBook.addBook(bookName, authorName);
+        }
+        public static bool login(BLLUser user, string userName, string password)
+        {
 
+            return user.Login(userName, password);
+
+        }
+        public static void printAllBooks(BLLBook book)
+        {
+            book.printAllBooks();
         }
         public static void printAllUsers(BLLUser user)
         {
@@ -149,11 +232,15 @@ namespace LibraryConsoleApp
         {
             user.removeUser(id);
         }
-        public static void printSingleUser(int id,BLLUser user)
+        public static void removeBook(int id, BLLBook book)
+        {
+            book.removeBook(id);
+        }
+        public static void printSingleUser(int id, BLLUser user)
         {
             user.printSingleUser(id);
         }
-        
+
 
         public static void updateUser(BLLUser user)
         {
@@ -168,7 +255,6 @@ namespace LibraryConsoleApp
 
                     Console.WriteLine("1)Update Username");
                     Console.WriteLine("2)Update Password");
-                    Console.WriteLine("3)Update Role");
                     switch (Console.ReadLine())
                     {
                         case "1":
@@ -181,11 +267,7 @@ namespace LibraryConsoleApp
                             string newPassword = Console.ReadLine();
                             user.updatePassword(userId, newPassword);
                             break;
-                        case "3":
-                            Console.WriteLine("Enter new Role");
-                            string newRole = Console.ReadLine();
-                            user.updateRole(userId, newRole);
-                            break;
+                      
                         default:
                             break;
                     }
@@ -199,8 +281,48 @@ namespace LibraryConsoleApp
             {
                 Console.WriteLine("Invalid entry");
 
+            }
+        }
+        public static void updateBook(BLLBook book)
+        {
+            int BookId;
+            Console.WriteLine("Enter Book Id");
+            bool success = int.TryParse(Console.ReadLine(), out BookId);
+            if (success)
+            {
+                if (book.bookExist(BookId))
+                {
+
+
+                    Console.WriteLine("1)Update Book Name");
+                    Console.WriteLine("2)Update Author");
+                    switch (Console.ReadLine())
+                    {
+                        case "1":
+                            Console.WriteLine("Enter new Book Name");
+                            string newBookName = Console.ReadLine();
+                            book.updateBookName(BookId, newBookName);
+                            break;
+                        case "2":
+                            Console.WriteLine("Enter new Author ");
+                            string newAuthor = Console.ReadLine();
+                            book.updateAuthor(BookId, newAuthor);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Book does not exist");
                 }
             }
+            else
+            {
+                Console.WriteLine("Invalid entry");
+
+            }
+        }
         }
     }
 

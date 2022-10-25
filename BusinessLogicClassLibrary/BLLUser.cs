@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataAcessClassLibrary;
 
 namespace BusinessLogicClassLibrary
 {
    public enum Roles
     {
         guest,
-        Administrator,
-        Librarian,
-        Patron
+        administrator,
+        librarian,
+        patron
     }
     public class BLLUser
     {
         int ID;
         string UserName { get; set; }
         string password { get; set; }
+        int RoleId { get; set; }
        public Roles Role { get; set; }
       //  BLLUser User = new BLLUser();
         List<BLLUser> bLLUsers = new List<BLLUser>();
+        List<DAUser> daUsers = new List<DAUser>();
+        DAUser user = new DAUser();
     public BLLUser()
         {
             ID = 0;
@@ -33,48 +37,55 @@ namespace BusinessLogicClassLibrary
             this.password = password;
            this.Role = role;
         }
-      public void addUser(BLLUser user)
+
+        public BLLUser(int role, string userName, string password)
         {
-            bLLUsers.Add(user);
+            RoleId = role;
+            UserName = userName;
+            this.password = password;
+        }
+
+        public void addUser(BLLUser users)
+        {
+            int roleID = (int)user.Role;
+           // user.AddUser(users.RoleId, users.UserName, users.password);
+
             Console.WriteLine("New user added");
         }
-        public void addUser(int id,string userName,string role,string password)
+        public void addUser(string userName,int role,string password)
         {
-            this.Role = Enum.Parse<Roles>(role);
-            bLLUsers.Add(new BLLUser(id,userName,this.Role,password));
+            bLLUsers.Add(new BLLUser(role,userName,password));
+           user.AddUser(role, userName, password);
+
+
         }
         public bool userExist(int id)
         {
-           return  bLLUsers.Any(p=> p.ID == id);
+            List<BLLUser> userList = Map(user.GetAllUser());
+
+            return userList.Any(p=> p.ID == id);
         }
         public void removeUser(int id)
         {
-            foreach (BLLUser user in bLLUsers)
-            {
-
-                if (user.ID == id)
-                {
-                    bLLUsers.Remove(user);
-                    Console.WriteLine("User Removed");
-                }
-                else
-                {
-                    Console.WriteLine("User does not exist");
-                }
-            }
+            user.RemoveUser(id);
 
         }
         public bool Login(string userName,string password)
         {
-            
-           bool sucess = bLLUsers.Any(p => p.UserName == userName && p.password == password);
+            List<BLLUser> userList = Map(user.GetAllUser());
+
+
+            bool sucess = userList.Any(p => p.UserName == userName && p.password == password);
 
             return sucess;
         }
-        public BLLUser getUserInfoForLogin(string userName, string password)
+        public int getUserInfoForLogin(string userName, string password)
         {
-            BLLUser user = bLLUsers.FirstOrDefault(p => p.UserName == userName && p.password == password);
-            return user;
+            List<BLLUser> userList = Map(user.GetAllUser());
+
+            BLLUser loginUser = userList.FirstOrDefault(p => p.UserName == userName && p.password == password);
+
+            return loginUser.RoleId;
 
         }
         public Roles getUserRole(string userName, string password)
@@ -89,102 +100,66 @@ namespace BusinessLogicClassLibrary
         }
         public void updateUserName (int id,string newUserName)
         {
-            foreach(BLLUser user in bLLUsers)
-            {
-                if(user.ID == id)
-                {
-                    user.UserName = newUserName;
-                    Console.WriteLine("Username update");
-                }
-                else
-                {
-                    Console.WriteLine("User does not exist");
-                }
-            }
+            user.UpdateUsername(id,newUserName);    
+
            
         }
 
         public void updatePassword(int id, string password)
         {
-            foreach (BLLUser user in bLLUsers)
-            {
-                if (user.ID == id)
-                {
-                    user.password = password;
-                    Console.WriteLine("Password Updated");
-                }
-                else
-                {
-                    Console.WriteLine("User does not exist");
-                }
-            }
+            user.UpadatePassword(id,password);
 
-        }
-        public void updateRole(int id, string newRole)
-        {
-            Roles updatedRole = Enum.Parse<Roles>(newRole);
-
-            foreach (BLLUser user in bLLUsers)
-            {
-                if (user.ID == id)
-                {
-                    user.Role = updatedRole;
-                    Console.WriteLine("User Role updated");
-                }
-                else
-                {
-                    Console.WriteLine("User Does not Exist");
-                }
-            }
-
-        }
-        public BLLUser getUser(int id)
-        {
-            foreach(BLLUser user in bLLUsers)
-            {
-                if(user.ID == id)
-                {
-                    return user;
-                }
-            }
-            return new BLLUser();
-        }
-        public void ValidateRole(string Role)
-        {
-            bool success = Enum.IsDefined(typeof(Roles), Role);
-            if (success)
-            {
-                Console.WriteLine("Access Granted");
-            }
-            else
-            {
-                Console.WriteLine("Access Denied");
-            }
         }
         public void printSingleUser(int id)
         {
-            foreach (BLLUser user in bLLUsers)
+            BLLRole role = new BLLRole();
+            user = user.GetUser(id);
+            if (user != null)
             {
-                if (user.ID == id)
-                {
-                    Console.WriteLine(user.ID);
-                    Console.WriteLine(user.UserName);
-                    Console.WriteLine(user.Role);
-                }
-                else
-                {
-                    Console.WriteLine("User does not Exist");
-                }
+                BLLUser bLLUser = Map(user);
+                Console.WriteLine("User ID: " + bLLUser.ID);
+                Console.WriteLine("Username: " + bLLUser.UserName);
+                Console.WriteLine("User Role: " + role.getRole(bLLUser.RoleId));
             }
+            else
+            {
+                Console.WriteLine("User does not exist ");
+            }
+
         }
         public void printAllUsers()
         {
-            foreach(BLLUser user in bLLUsers)
+            BLLRole role = new BLLRole();
+            List<BLLUser> userList = Map(user.GetAllUser());
+            foreach (BLLUser user in userList)
             {
-                Console.WriteLine(user.ID);
-                Console.WriteLine(user.UserName);
-                Console.WriteLine(user.Role);
+                Console.WriteLine("User ID: " + user.ID);
+                Console.WriteLine("Username: " + user.UserName);
+                Console.WriteLine("User Role: " + role.getRole(user.RoleId));
             }
+        }
+        public List<BLLUser> Map(List<DAUser> dAUsers)
+        {
+            
+            foreach(DAUser dAUser in dAUsers)
+            {
+                BLLUser user = new BLLUser();
+                user.ID = dAUser.ID;
+                user.UserName = dAUser.UserName;
+                user.password = dAUser.password;
+                user.RoleId = dAUser.Role;
+                bLLUsers.Add(user);
+            }
+            return bLLUsers;    
+        }
+        public BLLUser Map(DAUser dAUser)
+        {
+            BLLUser user = new BLLUser();
+            user.ID = dAUser.ID;
+            user.UserName = dAUser.UserName;
+            user.password = dAUser.password;
+            user.RoleId = dAUser.Role;
+            return user;
         }
     }
 }

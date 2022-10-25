@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryConsoleApp", "Librar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogicClassLibrary", "BusinessLogicClassLibrary\BusinessLogicClassLibrary.csproj", "{FCE6177A-04DB-4CB0-B2B9-2AAC6621D72C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAcessClassLibrary", "DataAcessClassLibrary\DataAcessClassLibrary.csproj", "{277D8ECF-613B-4749-BF76-E0173BAE4BF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessClassLibrary", "DataAcessClassLibrary\DataAccessClassLibrary.csproj", "{277D8ECF-613B-4749-BF76-E0173BAE4BF5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryTestProject", "LibraryTestProject\LibraryTestProject.csproj", "{64138903-2497-49D2-BDCD-5A9E0B344898}"
 EndProject
