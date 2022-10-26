@@ -36,11 +36,11 @@ namespace DataAcessClassLibrary
         }
       //  string connectionString = ConfigurationManager.ConnectionStrings["DBCONN"].ConnectionString;
         string connectionString = "Data Source=GDC-LAPTOP-308;Initial Catalog=Libary;Integrated Security=True";
-        List<DAUser> list = new List<DAUser>();
-        private DAUser user;
 
         public List<DAUser> GetAllUser()
         {
+            List<DAUser> list = new List<DAUser>();
+
 
             try
             {

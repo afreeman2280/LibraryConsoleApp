@@ -100,6 +100,7 @@ namespace BusinessLogicClassLibrary
         }
         public List<BLLBook> Map(List<DABook> dABooks)
         {
+            List<BLLBook> books = new List<BLLBook>();  
 
             foreach (DABook dbook in dABooks)
             {
@@ -107,9 +108,9 @@ namespace BusinessLogicClassLibrary
                 book.ID = dbook.ID;
                 book.Bookname = dbook.BookName;
                 book.Author = dbook.Author;
-                BLLBooks.Add(book);
+                books.Add(book);
             }
-            return BLLBooks;
+            return books;
         }
         public BLLBook Map(DABook dABook)
         {

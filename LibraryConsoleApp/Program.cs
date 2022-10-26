@@ -9,6 +9,8 @@ namespace LibraryConsoleApp
         public static BLLUser newUser = new BLLUser();
         public static BLLBook newBook = new BLLBook();
         public static BLLRole newRole = new BLLRole();
+        private static BLLBookInventory newBookInventory = new BLLBookInventory();
+        public static int temp = 0;
 
         static void Main(string[] args)
         {
@@ -35,7 +37,8 @@ namespace LibraryConsoleApp
                 Console.WriteLine("9) Print Books");
                 Console.WriteLine("10) Update Book ");
                 Console.WriteLine("11) Remove Book");
-                Console.WriteLine("12) Exit");
+                Console.WriteLine("12) CheckIn/CheckOut Book");
+                Console.WriteLine("13) Exit");
 
                 switch (Console.ReadLine())
                 {
@@ -53,6 +56,7 @@ namespace LibraryConsoleApp
                             loginUserName = userName;
                             loginRoleId = newUser.getUserInfoForLogin(userName, password);
                             loginRole = newRole.getRole(loginRoleId);
+                            temp = newUser.getID(userName, password);
                             Console.WriteLine("Login Sucessful");
                         }
                         else
@@ -187,6 +191,27 @@ namespace LibraryConsoleApp
                         }
                         break;
                     case "12":
+                        if (loginRole.ToLower() == "administrator" || loginRole.ToLower() == "librarian" || loginRole.ToLower() == "patron")
+                        {
+                            Console.WriteLine("Enter Id");
+                            success = int.TryParse(Console.ReadLine(), out id);
+                            if (success)
+                            {
+                                checkInOrOut();
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Not Valid Entry");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Only Administrator,Patrons and Librarians can use this feature");
+
+                        }
+                        break;
+                    case "13":
                         showMenu = false;
                         break;
                     default:
@@ -196,6 +221,49 @@ namespace LibraryConsoleApp
                 }
             }
         }
+
+        private static void checkInOrOut()
+        {
+            Console.WriteLine("Do you want to check in or out");
+            Console.WriteLine("Please Enter In or Out");
+            string option = Console.ReadLine(); 
+            if(option.ToLower() == "in")
+            {
+                Console.WriteLine("Enter Id of the book you want to check in");
+                int bookId = int.Parse(Console.ReadLine());
+                if (newBookInventory.ExistInInventory(bookId, temp))
+                {
+                    newBookInventory.checkedInInventory(bookId, temp);
+
+                }
+                else
+                {
+                    Console.WriteLine("You have not checked out this book");
+                }
+
+            }
+            else if (option.ToLower() == "out")
+            {
+                printAllBooks(newBook);
+                Console.WriteLine("Enter Book Id");
+                int bookId =int.Parse(Console.ReadLine());
+                if (!newBookInventory.ExistInInventory(bookId, temp))
+                {
+
+                   newBookInventory.addBookToInventory(bookId, temp);
+                }
+                else
+                {
+                    Console.WriteLine("Already checked out");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Invalid entry");
+            }
+        }
+
         public static void registerUser( BLLUser newUser)
         {
             Console.WriteLine("Enter UserName");

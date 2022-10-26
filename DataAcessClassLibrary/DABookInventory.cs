@@ -6,56 +6,59 @@ using System.Data.SqlClient;
 
 namespace DataAcessClassLibrary
 {
-    public class DABook
+    public class DABookInventory
     {
       
        public int ID;
-      public  string BookName { get; set; }
-       public  string Author { get; set; }
-        public int Role { get; set; }
-        DABook Book;
+     public int  UserId { get; set; }
+       public int  BookId  { get; set; }
+    public    bool  CheckedIn { get; set; }
+        DABookInventory Book;
         string connectionString = "Data Source=GDC-LAPTOP-308;Initial Catalog=Libary;Integrated Security=True";
 
       //  string connectionString = ConfigurationManager.ConnectionStrings["DBCONN"].ConnectionString;
 
 
-        public DABook()
+        public DABookInventory()
         {
-            ID = 0;
-            BookName = string.Empty;
-            Author = string.Empty;
+            this.ID = 0;
+            this.UserId = 0;
+            this.BookId = 0;
+            this.CheckedIn = false;
         }
-        public DABook(int iD, string BookName, string Author)
+        public DABookInventory(int iD, int userId, int bookId, bool checkedIn)
         {
-            this.ID = iD;
-            this.BookName = BookName;
-            this.Author = Author;
+           this. ID = iD;
+            this.UserId = userId;
+           this. BookId = bookId;
+           this. CheckedIn = checkedIn;
         }
 
-        public List<DABook> GetAllBook()
+        public List<DABookInventory> GetAllBookInventory()
         {
-            List<DABook> list = new List<DABook>();
+            List<DABookInventory> list = new List<DABookInventory>();
 
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("GetBooks", con))
+                    using (SqlCommand cmd = new SqlCommand("GetAllBooksInventory", con))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.CommandTimeout = 30;
                         con.Open();
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            DABook Book;
+                            DABookInventory Book;
 
                             while (reader.Read())
                             {
-                                Book = new DABook
+                                Book = new DABookInventory
                                 {
                                     ID = (int)reader["Id"],
-                                    BookName = (string)reader["Bookname"],
-                                    Author = (string)reader["Author"],
+                                    BookId = (int)reader["BookId"],
+                                    UserId = (int)reader["UserId"],
+                                    CheckedIn = (bool)(reader)["CheckedOut"],
                                    // Role = reader["RoleID"] is DBNull ? 1 : (int)reader["RoleID"],
 
 
@@ -73,18 +76,18 @@ namespace DataAcessClassLibrary
             catch (Exception ex)
             {
                 insertErrorLog(ex); 
-                return new List<DABook>();
+                return new List<DABookInventory>();
             }
 
         }
-        public DABook GetBook(int Id)
+        public DABookInventory GetUserCheckedOutBooks(int Id)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
 
-                    using (SqlCommand cmd = new SqlCommand("GetBook", con))
+                    using (SqlCommand cmd = new SqlCommand("GetUsersCheckedOutBooks", con))
                     {
 
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -97,11 +100,12 @@ namespace DataAcessClassLibrary
 
                             while (reader.Read())
                             {
-                                Book = new DABook
+                                Book = new DABookInventory
                                 {
                                     ID = (int)reader["Id"],
-                                    BookName = (string)reader["Bookname"],
-                                    Author = (string)reader["Author"],
+                                    BookId = (int)reader["BookId"],
+                                    UserId = (int)reader["UserId"],
+                                    CheckedIn = (bool)reader["CheckedOut"]
                                    // Role = reader["RoleID"] is DBNull ? 1 : (int)reader["RoleID"],
 
 
@@ -118,23 +122,24 @@ namespace DataAcessClassLibrary
             catch (Exception ex)
             {
                 insertErrorLog(ex);
-                return new DABook();
+                return new DABookInventory();
             }
 
         }
-        public void AddBook(string Bookname,string Author)
+        public void AddToBookInventory(int BookID,int UserID)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand("AddBook", con))
+                    using (SqlCommand command = new SqlCommand("AddToBookInventory", con))
                     {
                         con.Open();
 
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@Bookname", SqlDbType.VarChar)).Value = Bookname;
-                        command.Parameters.Add(new SqlParameter("@Author", SqlDbType.VarChar)).Value = Author;
+                        command.Parameters.Add(new SqlParameter("@BookId", SqlDbType.Int)).Value = BookID;
+                        command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.Int)).Value = UserID;
+                        command.Parameters.Add(new SqlParameter("@CheckedOut", SqlDbType.Bit)).Value = 1;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -145,18 +150,21 @@ namespace DataAcessClassLibrary
             }
 
         }
-        public void RemoveBook(int Id)
+        
+        
+        public void Checkin(int BookId,int UserId)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand command = new SqlCommand("RemoveBook", con))
+                    using (SqlCommand command = new SqlCommand("CheckInBook", con))
                     {
                         con.Open();
 
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int)).Value = Id;
+                        command.Parameters.Add(new SqlParameter("@BookId", SqlDbType.Int)).Value = BookId;
+                        command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.Int)).Value = UserId;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -167,52 +175,7 @@ namespace DataAcessClassLibrary
             }
 
         }
-        public void UpdateBookname(int id,string newBookname)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand command = new SqlCommand("UpdateBookName", con))
-                    {
-                        con.Open();
-
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int)).Value = id;
-                        command.Parameters.Add(new SqlParameter("@Bookname", SqlDbType.VarChar)).Value = newBookname;
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                insertErrorLog(ex);
-            }
-
-        }
-        public void UpadateAuthor(int id, string newAuthor)
-        {
-            try
-            {
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    using (SqlCommand command = new SqlCommand("UpdateAuthor", con))
-                    {
-                        con.Open();
-
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int)).Value = id;
-                        command.Parameters.Add(new SqlParameter("@Author", SqlDbType.VarChar)).Value = newAuthor;
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                insertErrorLog(ex);
-            }
-
-        }
+      
         public void insertErrorLog(Exception ex)
         {
             using (SqlConnection con = new SqlConnection(connectionString))

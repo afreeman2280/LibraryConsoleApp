@@ -79,6 +79,15 @@ namespace BusinessLogicClassLibrary
 
             return sucess;
         }
+        public int getID(string userName, string password)
+        {
+            List<BLLUser> userList = Map(user.GetAllUser());
+
+
+            BLLUser userID = userList.FirstOrDefault(p => p.UserName == userName && p.password == password);
+
+            return userID.ID;
+        }
         public int getUserInfoForLogin(string userName, string password)
         {
             List<BLLUser> userList = Map(user.GetAllUser());
@@ -87,16 +96,6 @@ namespace BusinessLogicClassLibrary
 
             return loginUser.RoleId;
 
-        }
-        public Roles getUserRole(string userName, string password)
-        {
-            
-            foreach(BLLUser user in bLLUsers)
-                if(user.UserName == userName && user.password == password)
-                {
-                    return user.Role;
-                }
-            return Roles.guest;
         }
         public void updateUserName (int id,string newUserName)
         {
@@ -140,6 +139,7 @@ namespace BusinessLogicClassLibrary
         }
         public List<BLLUser> Map(List<DAUser> dAUsers)
         {
+            List<BLLUser> userList = new List<BLLUser>();   
             
             foreach(DAUser dAUser in dAUsers)
             {
@@ -148,9 +148,9 @@ namespace BusinessLogicClassLibrary
                 user.UserName = dAUser.UserName;
                 user.password = dAUser.password;
                 user.RoleId = dAUser.Role;
-                bLLUsers.Add(user);
+                userList.Add(user);
             }
-            return bLLUsers;    
+            return userList;    
         }
         public BLLUser Map(DAUser dAUser)
         {
